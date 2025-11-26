@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: study-app
-        image: segundavid/studybuddy:v8
+        image: segundavid/studybuddy:v9
         ports:
         - containerPort: 8501
         env:
