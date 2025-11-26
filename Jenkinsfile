@@ -30,53 +30,55 @@ pipeline {
                 }
             }
         }
-        // stage("Update Deployment YAML with New Tag") {
-        //     steps {
-        //         script {
-        //             sh """
-        //             sed -i 's|image: segundavid/studybuddy:.*|image: segundavid/studybuddy:${IMAGE_TAG}|' manifests/deployment.yaml
-        //             """
-        //         }
-        //     }
-        // }
-        // stage("Commit Updated YAML") {
-        //     steps {
-        //         script {
-        //             withCredentials([usernamePassword(credentialsId: "github-token", usernameVariable: "GIT_USER", passwordVariable: "GIT_PASS")]) {
-        //                 sh """
-        //                 git config user.name 'segun-ogundipe'
-        //                 git config user.email 'segun.d.ogundipe@gmail.com'
-        //                 git add manifests/deployment.yaml
-        //                 git commit -m 'Update image tag to ${IMAGE_TAG}' || echo 'No changes to commit'
-        //                 git push https://${GIT_USER}:${GIT_PASS}@github.com/segun-ogundipe/study-buddy.git HEAD:main
-        //                 """
-        //             }
-        //         }
-        //     }
-        // }
-        // stage("Install Kubectl & ArgoCD CLI Setup") {
-        //     steps {
-        //         sh """
-        //         echo 'Installing Kubectl $ ArgoCD cli...'
-        //         curl -LO 'htpps:/dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl'
-        //         chmod +x kubectl
-        //         mv kubectl /usr/local/bin/kubectl
-        //         curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
-        //         chmod +x /usr/local/bin/argocd
-        //         """
-        //     }
-        // }
-        // stage("apply Kubernetes & Sync App with ArgoCD") {
-        //     steps {
-        //         script {
-        //             kubconfig(credentialsId: "kubeconfig", serverUrl: "https://192.168.49.2:8443") {
-        //                 sd """
-        //                 argocd login 34.45.193.5:31704 --username admin --password $(kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath="{.data.password}" | bas64 -d) --insecure
-        //                 argocd app sync study
-        //                 """
-        //             }
-        //         }
-        //     }
-        // }
+        stage("Update Deployment YAML with New Tag") {
+            steps {
+                script {
+                    sh """
+                    echo 'Updating tag for docker image in deployment.yaml'
+                    sed -i 's|image: segundavid/studybuddy:.*|image: segundavid/studybuddy:${IMAGE_TAG}|' manifests/deployment.yaml
+                    """
+                }
+            }
+        }
+        stage("Commit Updated YAML") {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: "github-token", usernameVariable: "GIT_USER", passwordVariable: "GIT_PASS")]) {
+                        sh """
+                        echo 'Pushing changes to GitHub'
+                        git config user.name 'segun-ogundipe'
+                        git config user.email 'segun.d.ogundipe@gmail.com'
+                        git add manifests/deployment.yaml
+                        git commit -m 'Update image tag to ${IMAGE_TAG}' || echo 'No changes to commit'
+                        git push https://${GIT_USER}:${GIT_PASS}@github.com/segun-ogundipe/study-buddy.git HEAD:main
+                        """
+                    }
+                }
+            }
+        }
+        stage("Install Kubectl & ArgoCD CLI Setup") {
+            steps {
+                sh """
+                echo 'Installing Kubectl $ ArgoCD cli...'
+                curl -LO 'htpps:/dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl'
+                chmod +x kubectl
+                mv kubectl /usr/local/bin/kubectl
+                curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+                chmod +x /usr/local/bin/argocd
+                """
+            }
+        }
+        stage("apply Kubernetes & Sync App with ArgoCD") {
+            steps {
+                script {
+                    kubconfig(credentialsId: "kubeconfig", serverUrl: "https://192.168.49.2:8443") {
+                        sd """
+                        argocd login 34.61.213.84:31704 --username admin --password $(kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath="{.data.password}" | bas64 -d) --insecure
+                        argocd app sync study-buddy
+                        """
+                    }
+                }
+            }
+        }
     }
 }
