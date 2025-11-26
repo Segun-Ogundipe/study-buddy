@@ -72,8 +72,8 @@ pipeline {
             steps {
                 script {
                     kubconfig(credentialsId: "kubeconfig", serverUrl: "https://192.168.49.2:8443") {
-                        sd """
-                        argocd login 34.61.213.84:31704 --username admin --password $(kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath="{.data.password}" | bas64 -d) --insecure
+                        sh """
+                        argocd login 34.61.213.84:31704 --username admin --password $(kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath='{.data.password}' | bas64 -d) --insecure
                         argocd app sync study-buddy
                         """
                     }
