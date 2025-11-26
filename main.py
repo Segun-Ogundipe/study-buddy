@@ -23,7 +23,7 @@ def main():
     if "rerun_trigger" not in st.session_state:
         st.session_state.rerun_trigger = False
     
-    st.title("Study Buddy")
+    st.title("GenAI Study Buddy")
     
     st.sidebar.header("Quiz Settings")
     
