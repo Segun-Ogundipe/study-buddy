@@ -28,11 +28,19 @@ class QuizManager:
         try:
             for _ in range(num_questions):
                 if question_type == "MCQ":
-                    question = generator.generate_mcq(topic, difficulty.lower())
+                    question = generator.generate_mcq(
+                        topic,
+                        [question.question for question in self.questions],
+                        difficulty.lower()
+                    )
                     
                     self.questions.append(question)
                 else:
-                    question = generator.generate_fill_in_the_blank(topic, difficulty.lower())
+                    question = generator.generate_fill_in_the_blank(
+                        topic,
+                        [question.question for question in self.questions],
+                        difficulty.lower()
+                    )
                     
                     self.questions.append(question)
         except Exception as e:

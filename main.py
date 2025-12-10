@@ -4,12 +4,29 @@ from dotenv import load_dotenv
 import streamlit as st
 load_dotenv()
 
+from src.config.ui_config import Config
 from src.generator.question_generator import QuestionGenerator
 from src.utils.helpers import *
 
+ui_config = Config()
 
 def main():
-    st.set_page_config(page_title="Study Buddy", page_icon="🎧🎧")
+    st.set_page_config(page_title=f"{ui_config.get_page_title()}", page_icon="🎧🎧")
+    
+    if "model_provider" not in st.session_state:
+        st.session_state.model_provider = ""
+    
+    if "model" not in st.session_state:
+        st.session_state.model = ""
+        
+    if "temperature" not in st.session_state:
+        st.session_state.temperature = 0
+        
+    if "api_key" not in st.session_state:
+        st.session_state.api_key = ""
+        
+    if "model_name" not in st.session_state:
+        st.session_state.model_name = ""
     
     if "quiz_manager" not in st.session_state:
         st.session_state.quiz_manager = QuizManager()
@@ -18,46 +35,84 @@ def main():
         st.session_state.quiz_generated = False
         
     if "quiz_submitted" not in st.session_state:
-        st.session_state.quiz_submitted = False        
-    
-    st.title("GenAI Study Buddy")
-    
-    st.sidebar.header("Quiz Settings")
-    
-    question_type = st.sidebar.selectbox(
-        "Select Question Type",
-        ["Multiple Choice", "Fill in The Blank"],
-        index=0
-    )
-    
-    topic = st.sidebar.text_input("Enter Topic", placeholder="Indian History, Geography...")
-    
-    difficulty = st.sidebar.selectbox(
-        "Difficulty Level",
-        ["Easy", "Medium", "Hard"],
-        index=1
-    )
-    
-    num_questions = st.sidebar.number_input(
-        "Number of Questions",
-        min_value=1,
-        max_value=10,
-        value=5
-    )
-    
-    if st.sidebar.button("Generate Quiz"):
         st.session_state.quiz_submitted = False
+    
+    st.title(f"GenAI {ui_config.get_page_title()}")
+    
+    with st.sidebar:
+        with st.expander("Quiz Settings", icon="🏆", expanded=True):
         
-        generator = QuestionGenerator()
-        success = st.session_state.quiz_manager.generate_questions(
-            generator,
-            topic,
-            "MCQ" if question_type == "Multiple Choice" else "FiTB",
-            difficulty,
-            num_questions
-        )
-        
-        st.session_state.quiz_generated = success
+            question_type = st.selectbox(
+                "Select Question Type",
+                ["Multiple Choice", "Fill in The Blank"],
+                index=0
+            )
+            
+            topic = st.text_input("Enter Topic", placeholder="African History, Geography...")
+            
+            difficulty = st.selectbox(
+                "Difficulty Level",
+                ["Easy", "Medium", "Hard"],
+                index=1
+            )
+            
+            num_questions = st.slider(
+                "Number of Questions",
+                min_value=1,
+                max_value=10,
+                value=5
+            )
+            
+            num_retries = st.slider(
+                label="Number of Retries",
+                min_value=1,
+                max_value=5,
+                value=3
+            )
+            
+            if st.button("Generate Quiz"):
+                st.session_state.quiz_submitted = False
+                
+                generator = QuestionGenerator(
+                    user_controls={
+                        "model_provider": st.session_state.model_provider,
+                        "model": st.session_state.model,
+                        "api_key": st.session_state.api_key,
+                        "temperature": st.session_state.temperature,
+                        "model_name": st.session_state.model_name,
+                        "num_retries": num_retries
+                    }
+                )
+                success = st.session_state.quiz_manager.generate_questions(
+                    generator,
+                    topic,
+                    "MCQ" if question_type == "Multiple Choice" else "FiTB",
+                    difficulty,
+                    num_questions
+                )
+                
+                st.session_state.quiz_generated = success
+    
+        with st.expander("Model Configuration", icon="⚙️"):
+            providers = ui_config.get_providers()
+            openai_models = ui_config.get_openai_models()
+            groq_models = ui_config.get_groq_models()
+            
+            st.session_state.model_provider = st.selectbox("Select Provider", providers)
+            if st.session_state.model_provider == "Groq":
+                st.session_state.model = st.selectbox("Select Groq Model", groq_models)
+                st.session_state.api_key = st.text_input("Enter Groq API Key", type="password")
+                if not st.session_state.api_key:
+                    st.warning("⚠️ Groq API Key is required. Using key set in GROQ_API_KEY")
+            elif st.session_state.model_provider == "OpenAI":
+                st.session_state.model = st.selectbox("Select OpenAI Model", openai_models)
+                st.session_state.api_key = st.text_input("Enter OpenAI API Key", type="password")
+                if not st.session_state.api_key:
+                    st.warning("⚠️ OpenAI API Key is required. Using key set in OPENAI_API_KEY")
+                    
+        with st.expander("Persona Configuration", icon="😎"):
+            st.session_state.model_name = st.text_input("Model Name", value="Tidal")
+            st.session_state.temperature = st.slider("Temperature", min_value=0.0, max_value=1.0, value=0.6, step=0.1)
     
     if st.session_state.quiz_generated and st.session_state.quiz_manager.questions:
         st.header("Quiz")

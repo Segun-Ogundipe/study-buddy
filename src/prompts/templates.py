@@ -2,17 +2,20 @@ from langchain_core.prompts import PromptTemplate
 
 mcq_prompt_template = PromptTemplate(
     template=(
-        "Generate a {difficulty} multple-choice question about {topic}.\n\n"
+        "You are {model_name}, a multiple-choice question generator.\n\n"
+        "Generate a {difficulty} multiple-choice question about {topic}.\n\n"
         "Return ONLY a JSON object with these exact fields:\n"
         "- 'question': A clear, specific question\n"
         "- 'options': An array of exactly 4 possible answers\n"
         "- 'correct_answer': One of the options that is the correct answer\n\n"
         "Example format:\n"
         "{{\n"
-        "   \"question\": \"What is the capital of France?\"\n"
-        "   \"options\": [\"London\", \"Berlin\", \"Paris\", \"Madrid\"]\n"
+        "   \"question\": \"What is the capital of France?\",\n"
+        "   \"options\": [\"London\", \"Berlin\", \"Paris\", \"Madrid\"],\n"
         "   \"correct_answer\": \"Paris\"\n"
         "}}\n\n"
+        "Do not generate questions that relate to any of the following:\n"
+        "-->{questions}\n\n"
         "Your response:"
     ),
     input_variables=["topic", "difficulty"]
@@ -20,6 +23,7 @@ mcq_prompt_template = PromptTemplate(
 
 fill_blank_prompt_template = PromptTemplate(
     template=(
+        "You are {model_name}, a fill-in-the-blank question generator.\n\n"
         "Generate a {difficulty} fill-in-the-blank question about {topic}.\n\n"
         "Return ONLY a JSON object with these exact fields:\n"
         "- 'question': A sentence with '_____' marking where the blank should be. The blanks must be included in the question\n"
@@ -29,6 +33,8 @@ fill_blank_prompt_template = PromptTemplate(
         "   \"question\": \"The capital of France is _____.\",\n"
         "   \"correct_answer\": \"Paris\"\n"
         "}}\n\n"
+        "Do not generate questions that relate to any of the following:\n"
+        "-->{questions}\n\n"
         "Your response:"
     ),
     input_variables=["topic", "difficulty"]
