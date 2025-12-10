@@ -19,9 +19,6 @@ def main():
     if "model" not in st.session_state:
         st.session_state.model = ""
         
-    if "temperature" not in st.session_state:
-        st.session_state.temperature = 0
-        
     if "api_key" not in st.session_state:
         st.session_state.api_key = ""
         
@@ -56,6 +53,14 @@ def main():
                 index=1
             )
             
+            temperature = st.slider(
+                "Temperature",
+                min_value=0.0,
+                max_value=1.0,
+                value=0.6,
+                step=0.1
+            )
+            
             num_questions = st.slider(
                 "Number of Questions",
                 min_value=1,
@@ -78,7 +83,7 @@ def main():
                         "model_provider": st.session_state.model_provider,
                         "model": st.session_state.model,
                         "api_key": st.session_state.api_key,
-                        "temperature": st.session_state.temperature,
+                        "temperature": temperature,
                         "model_name": st.session_state.model_name,
                         "num_retries": num_retries
                     }
@@ -99,6 +104,7 @@ def main():
             groq_models = ui_config.get_groq_models()
             
             st.session_state.model_provider = st.selectbox("Select Provider", providers)
+            st.session_state.model_name = st.text_input("Model Name", value="Tidal")
             if st.session_state.model_provider == "Groq":
                 st.session_state.model = st.selectbox("Select Groq Model", groq_models)
                 st.session_state.api_key = st.text_input("Enter Groq API Key", type="password")
@@ -109,10 +115,6 @@ def main():
                 st.session_state.api_key = st.text_input("Enter OpenAI API Key", type="password")
                 if not st.session_state.api_key:
                     st.warning("⚠️ OpenAI API Key is required. Using key set in OPENAI_API_KEY")
-                    
-        with st.expander("Persona Configuration", icon="😎"):
-            st.session_state.model_name = st.text_input("Model Name", value="Tidal")
-            st.session_state.temperature = st.slider("Temperature", min_value=0.0, max_value=1.0, value=0.6, step=0.1)
     
     if st.session_state.quiz_generated and st.session_state.quiz_manager.questions:
         st.header("Quiz")

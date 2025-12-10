@@ -17,8 +17,6 @@ class QuestionGenerator:
         
     def _retry_and_parse(self, prompt: PromptTemplate, parser: PydanticOutputParser, topic: str, difficulty: str, questions: List[str]):
         for attempt in range(self.user_controls["num_retries"]):
-            self.logger.info(f"Retries: {self.user_controls['num_retries']}")
-            self.logger.info(f"Retries: {attempt}")
             try:
                 self.logger.info(f"Generating question for topic {topic} with difficulty {difficulty}")
                 response = self.llm.invoke(
