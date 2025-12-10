@@ -7,9 +7,6 @@ import streamlit as st
 from src.generator.question_generator import QuestionGenerator
 from src.models.question_schemas import FillBlankQuestion, MCQQuestion
 
-def rerun():
-    st.session_state["rerun_trigger"] = not st.session_state.get("rerun_trigger", False)
-
 class QuizManager:
     def __init__(self):
         self.questions: List[MCQQuestion | FillBlankQuestion] = []

@@ -18,10 +18,7 @@ def main():
         st.session_state.quiz_generated = False
         
     if "quiz_submitted" not in st.session_state:
-        st.session_state.quiz_submitted = False
-        
-    if "rerun_trigger" not in st.session_state:
-        st.session_state.rerun_trigger = False
+        st.session_state.quiz_submitted = False        
     
     st.title("GenAI Study Buddy")
     
@@ -61,7 +58,6 @@ def main():
         )
         
         st.session_state.quiz_generated = success
-        # rerun()
     
     if st.session_state.quiz_generated and st.session_state.quiz_manager.questions:
         st.header("Quiz")
@@ -70,7 +66,6 @@ def main():
         if st.button("Submit Quiz"):
             st.session_state.quiz_manager.evaluate_quiz()
             st.session_state.quiz_submitted = True
-            # rerun()
         
     if st.session_state.quiz_submitted:
         st.header("Quiz Results")
@@ -98,7 +93,7 @@ def main():
                 if saved_file:
                     with open(saved_file, "rb") as f:
                         st.download_button(
-                            label="Doenload Results",
+                            label="Download Results",
                             data=f.read(),
                             file_name=os.path.basename(saved_file),
                             mime="text/csv"

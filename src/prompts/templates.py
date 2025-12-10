@@ -22,11 +22,11 @@ fill_blank_prompt_template = PromptTemplate(
     template=(
         "Generate a {difficulty} fill-in-the-blank question about {topic}.\n\n"
         "Return ONLY a JSON object with these exact fields:\n"
-        "- 'question': A sentence with '_____' marking where the blank should be\n"
+        "- 'question': A sentence with '_____' marking where the blank should be. The blanks must be included in the question\n"
         "- 'correct_answer': The correct word or phrase that belongs in the blank\n\n"
         "Example format:\n"
         "{{\n"
-        "   \"question\": \"The capital of France is _____.\"\n"
+        "   \"question\": \"The capital of France is _____.\",\n"
         "   \"correct_answer\": \"Paris\"\n"
         "}}\n\n"
         "Your response:"
