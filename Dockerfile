@@ -8,14 +8,10 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 # Work directory inside the docker container
 WORKDIR /app
 
-# Installing system dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
-
 #  Copy all contents from local to container in /app
-COPY . .
+COPY ./src src
+COPY ./main.py main.py
+COPY ./pyproject.toml pyproject.toml
 
 # Setup the project
 RUN uv sync --refresh
