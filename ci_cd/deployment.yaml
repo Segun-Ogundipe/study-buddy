@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: study-container
-        image: segundavid/studybuddy:v0
+        image: segundavid/studybuddy-repo:v0
         ports:
         - containerPort: 8501
         resources:
