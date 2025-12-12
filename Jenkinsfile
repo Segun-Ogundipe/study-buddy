@@ -11,7 +11,7 @@ pipeline {
             steps {
                 script {
                     echo "${IMAGE_LABEL} build starting..."
-                    sh "docker build -t ${IMAGE_LABEL} ."
+                    dockerImage = docker.build("${IMAGE_LABEL}")
                     echo "Done building ${IMAGE_LABEL}..."
                 }
             }
@@ -20,10 +20,10 @@ pipeline {
             steps {
                 script {
                     echo "Pushing ${IMAGE_LABEL} to Docker Hub..."
-                    sh """
-                    docker push ${IMAGE_LABEL}
+                    docker.withRegistry("https://registry.hub.docker.com", "${DOCKER_HUB_CREDENTIALS_ID}") {
+                        dockerImage.push("${IMAGE_TAG}")
+                    }
                     echo "Done pushing ${IMAGE_LABEL} to Docker Hub..."
-                    """
                 }
             }
         }
