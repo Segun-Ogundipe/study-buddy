@@ -11,7 +11,7 @@ pipeline {
             steps {
                 script {
                     echo "${IMAGE_LABEL} build starting..."
-                    sh "docker build -t ${IMAGE_LABE} ."
+                    sh "docker build -t ${IMAGE_LABEL} ."
                     echo "Done building ${IMAGE_LABEL}..."
                 }
             }
