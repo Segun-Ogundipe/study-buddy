@@ -4,23 +4,26 @@ pipeline {
         DOCKER_HUB_REPO = "segundavid/studybuddy-repo"
         DOCKER_HUB_CREDENTIALS_ID = "dockerhub-token"
         IMAGE_TAG = "v${BUILD_NUMBER}"
+        IMAGE_LABEL = "${DOCKER_HUB_REPO}:${IMAGE_TAG}"
     }
     stages {
         stage("Build Docker Image") {
             steps {
                 script {
-                    echo "Building Docker image..."
-                    dockerImage = docker.build("${DOCKER_HUB_REPO}:${IMAGE_TAG}")
+                    echo "${IMAGE_LABEL} build starting..."
+                    sh "docker build -t ${IMAGE_LABE} ."
+                    echo "Done building ${IMAGE_LABEL}..."
                 }
             }
         }
         stage("Push Image to DockerHub") {
             steps {
                 script {
-                    echo "Pushing Docker image to DockerHub..."
-                    docker.withRegistry("https://registry.hub.docker.com", "${DOCKER_HUB_CREDENTIALS_ID}") {
-                        dockerImage.push("${IMAGE_TAG}")
-                    }
+                    echo "Pushing ${IMAGE_LABEL} to Docker Hub..."
+                    sh """
+                    docker push ${IMAGE_LABEL}
+                    echo "Done pushing ${IMAGE_LABEL} to Docker Hub..."
+                    """
                 }
             }
         }
@@ -29,7 +32,7 @@ pipeline {
                 script {
                     sh """
                     echo 'Updating tag for docker image in deployment.yaml'
-                    sed -i 's|image: ${DOCKER_HUB_REPO}:.*|image: ${DOCKER_HUB_REPO}:${IMAGE_TAG}|' ci_cd/deployment.yaml
+                    sed -i 's|image: ${DOCKER_HUB_REPO}:.*|image: ${IMAGE_LABEL}|' ci_cd/deployment.yaml
                     """
                 }
             }
