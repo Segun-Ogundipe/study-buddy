@@ -11,9 +11,10 @@ from src.prompts.templates import mcq_prompt_template, fill_blank_prompt_templat
 
 class QuestionGenerator:
     def __init__(self, user_controls):
+        self.logger = get_logger(self.__class__.__name__)
         self.user_controls = user_controls
         self.llm = get_groq_llm(user_controls) if user_controls["model_provider"] == "Groq" else get_openai_llm(user_controls)
-        self.logger = get_logger(self.__class__.__name__)
+        self.logger.info(f"Model Detail:\n\tName: {self.llm.model_name}\n\tTemperature: {self.llm.temperature}")
         
     def _retry_and_parse(self, prompt: PromptTemplate, parser: PydanticOutputParser, topic: str, difficulty: str, questions: List[str]):
         for attempt in range(self.user_controls["num_retries"]):
