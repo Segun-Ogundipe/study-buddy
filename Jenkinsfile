@@ -67,7 +67,7 @@ pipeline {
         //         '''
         //     }
         // }
-        stage("apply Kubernetes & Sync App with ArgoCD") {
+        stage("Apply Kubernetes & Sync App with ArgoCD") {
             steps {
                 script {
                     echo "Syncing app using ArgoCD..."
