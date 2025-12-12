@@ -6,6 +6,6 @@ spec:
   selector:
     app: study-app
   ports:
-    - port: 80
-      targetPort: 8501
-  type: NodePort
+  - port: 80
+    targetPort: 8501
+  type: LoadBalancer

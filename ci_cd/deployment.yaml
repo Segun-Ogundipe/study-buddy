@@ -13,13 +13,24 @@ spec:
         app: study-app
     spec:
       containers:
-      - name: study-app
+      - name: study-container
         image: segundavid/studybuddy:v26
         ports:
         - containerPort: 8501
+        resources:
+          requests:
+            cpu: 0.5
+            memory: 250Mi
+          limits:
+            memory: 500Mi
         env:
         - name: GROQ_API_KEY
           valueFrom:
             secretKeyRef:
               name: groq-api-secret
               key: GROQ_API_KEY
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: openai-api-key
+              key: OPENAI_API_KEY
