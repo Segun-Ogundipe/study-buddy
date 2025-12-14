@@ -61,7 +61,7 @@ pipeline {
                     echo "Syncing app using ArgoCD..."
                     kubeconfig(credentialsId: "kubeconfig", serverUrl: "https://192.168.49.2:8443") {
                         sh '''
-                        argocd 35.224.91.174:9090 --username admin --password $(kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d) --insecure
+                        argocd login 35.224.91.174:9090 --username admin --password $(kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d) --insecure
                         argocd app sync study-buddy
                         '''
                     }
