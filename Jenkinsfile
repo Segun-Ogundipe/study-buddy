@@ -7,6 +7,9 @@ pipeline {
         DOCKER_HUB_CREDENTIALS_ID = "dockerhub-token"
         IMAGE_TAG = "v${BUILD_NUMBER}"
         IMAGE_LABEL = "${DOCKER_HUB_REPO}:${IMAGE_TAG}"
+        GKE_CLUSTER = "study-buddy"
+        GKE_REGION = "us-central1"
+        GKE_PROJECT_ID = "mineral-brand-478714-v4"
     }
     stages {
         stage("Build Docker Image") {
@@ -55,17 +58,22 @@ pipeline {
                 }
             }
         }
-        stage("Apply Kubernetes & Sync App with ArgoCD") {
+        stage("Deploy Application on GKE") {
             steps {
                 script {
-                    echo "Syncing app using ArgoCD..."
-                    kubeconfig(credentialsId: "kubeconfig", serverUrl: "https://192.168.49.2:8443") {
-                        sh '''
-                        argocd login 35.224.91.174:9090 --username admin --password $(kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d) --insecure
-                        argocd app sync study-buddy
-                        '''
+                    echo "Deploying app on GKE..."
+                    withCredentials([file(credentialsId: "gke-file", variable: "GKE_CREDENTIAL")]) {
+                        sh """
+                        gcloud auth activate-service-account --key-file=$GKE_CREDENTIAL
+                        gcloud container clusters get-credentials ${GKE_CLUSTER} --region ${GKE_REGION} --project ${GKE_PROJECT_ID}
+
+                        kubectl apply -f ci_cd/deployment.yaml --validate=false
+                        kubectl apply -f ci_cd/service.yaml --validate=false
+
+                        kubectl rollout restart deployment study-app
+                        """
                     }
-                    echo "Successfully synced app using ArgoCD"
+                    echo "App deployed successfully"
                 }
             }
         }
