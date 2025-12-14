@@ -42,15 +42,21 @@ def main():
             question_type = st.selectbox(
                 "Select Question Type",
                 ["Multiple Choice", "Fill in The Blank"],
-                index=0
+                index=0,
+                help="Select one of Multiple Choice questions or Fill in the Blank type questions"
             )
             
-            topic = st.text_input("Enter Topic", placeholder="African History, Geography...")
+            topic = st.text_input(
+                "Enter Topic",
+                placeholder="African History, Geography...",
+                help="Enter the topic the questions should be generated from"
+            )
             
             difficulty = st.selectbox(
                 "Difficulty Level",
                 ["Easy", "Medium", "Hard"],
-                index=1
+                index=1,
+                help="Select level of difficulty"
             )
             
             temperature = st.slider(
@@ -58,21 +64,24 @@ def main():
                 min_value=0.0,
                 max_value=1.0,
                 value=0.6,
-                step=0.1
+                step=0.1,
+                help="Select low value for a more deterministic LLM"
             )
             
             num_questions = st.slider(
                 "Number of Questions",
                 min_value=1,
                 max_value=10,
-                value=5
+                value=5,
+                help="Number of questions to be generated"
             )
             
             num_retries = st.slider(
                 label="Number of Retries",
                 min_value=1,
                 max_value=5,
-                value=3
+                value=3,
+                help="How many times should the LLM try to generate a question after initial falure"
             )
             
             if st.button("Generate Quiz"):
